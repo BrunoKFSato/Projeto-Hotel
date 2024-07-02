@@ -1,0 +1,328 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// ESTRUTURA REGISTRO
+typedef struct reg {
+    char nome[25], sobrenome[50];
+    int idade, dias;
+    int NQuartos; // Adicionado para armazenar o número de quartos
+    char CPF[12]; // CPF como string para armazenar até 11 dígitos + terminador nulo
+} Registro;
+
+// VETOR/BANCO DE DADOS CLIENTE
+Registro *Cli = NULL; // Array para armazenar clientes
+int Ncli = 0; // Número atual de clientes registrados
+int capacity = 0; // Capacidade atual do array (inicialmente zero)
+
+void resizeCliArray() {
+    if (Ncli >= capacity) {
+        if (capacity == 0) {
+            capacity = 2; // Capacidade inicial
+            Cli = (Registro *)malloc(capacity * sizeof(Registro));
+        } else {
+            capacity *= 2; // Dobra a capacidade
+            Cli = (Registro *)realloc(Cli, capacity * sizeof(Registro));
+        }
+        if (Cli == NULL) {
+            printf("Erro ao alocar memória.\n");
+            exit(1);
+        }
+    }
+}
+
+void registro() {
+    resizeCliArray();
+
+    printf("Hotel Dispor!!!\n");
+    printf("Nome: ");
+    scanf("%s", Cli[Ncli].nome);
+    getchar(); // Limpar o buffer de entrada
+
+    printf("Sobrenome: ");
+    scanf("%s", Cli[Ncli].sobrenome);
+    getchar(); // Limpar o buffer de entrada
+
+    printf("Idade: ");
+    scanf("%d", &Cli[Ncli].idade);
+
+    printf("Digite o número do CPF sem pontos, espaços ou traços: ");
+    scanf("%s", Cli[Ncli].CPF);
+    getchar(); // Limpar o buffer de entrada
+
+    Ncli++;
+}
+
+void definirQuartosParaTodos() {
+    int quartos;
+
+    printf("Hotel Dispor!!!\n");
+    printf("Número de quartos para todo o grupo: ");
+    scanf("%d", &quartos);
+
+    for (int i = 0; i < Ncli; i++) {
+        Cli[i].NQuartos = quartos;
+    }
+
+    printf("Número de quartos definido para todo o grupo!\n");
+}
+
+void definirDiasIndividualmente() {
+    int cliente, dias;
+    char continuar;
+
+    do {
+        printf("Digite o Código de Identificação do cliente registrado:\n");
+        printf(": ");
+        scanf("%d", &cliente);
+        cliente--; // ajustar para índice do vetor
+
+        if (cliente >= 0 && cliente < Ncli) {
+            printf("Digite o número de dias para o cliente %s: ", Cli[cliente].nome);
+            scanf("%d", &dias);
+            Cli[cliente].dias = dias;
+        } else {
+            printf("Cliente não encontrado!\n");
+        }
+
+        printf("Deseja definir dias para outro cliente? (s/n): ");
+        scanf(" %c", &continuar);
+        getchar(); // Limpar o buffer de entrada
+    } while (continuar == 's' || continuar == 'S');
+}
+
+void mostrarDados() {
+    int op;
+
+    for (int i = 0; i < Ncli; i++) {
+        printf("\n");
+        printf("---------------------------------------\n");
+        printf("Nome: %s %s\n", Cli[i].nome, Cli[i].sobrenome);
+        printf("Idade: %d\n", Cli[i].idade);
+        printf("CPF: %s\n", Cli[i].CPF);
+        printf("Número de Quartos: %d\n", Cli[i].NQuartos);
+        printf("Número de Dias: %d\n", Cli[i].dias);
+        printf("---------------------------------------\n");
+        printf("\n");
+    }
+
+    do {
+        printf("Digite 1 para voltar ao menu!\n");
+        printf(": ");
+        scanf("%d", &op);
+        getchar(); // Limpar o buffer de entrada
+    } while (op != 1);
+}
+
+void editar() {
+    int cliente, op2;
+    printf("Digite o Código de Identificação do cliente registrado:\n");
+    printf(": ");
+    scanf("%d", &cliente);
+
+    printf("Selecione o dado que deseja alterar:\n");
+    printf("1- Nome\n");
+    printf("2- Sobrenome\n");
+    printf("3- Idade\n");
+    printf("4- CPF\n");
+    printf("5- Número de quartos\n");
+    printf("6- Número de dias\n");
+
+    printf(": ");
+    scanf("%d", &op2);
+
+    cliente--; // ajustar para índice do vetor
+
+    switch (op2) {
+        case 1:
+            printf("Nome: ");
+            scanf("%s", Cli[cliente].nome);
+            getchar(); // Limpar o buffer de entrada
+            break;
+        case 2:
+            printf("Sobrenome: ");
+            scanf("%s", Cli[cliente].sobrenome);
+            getchar(); // Limpar o buffer de entrada
+            break;
+        case 3:
+            printf("Idade: ");
+            scanf("%d", &Cli[cliente].idade);
+            break;
+        case 4:
+            printf("Digite o número do CPF sem pontos, espaços ou traços: ");
+            scanf("%s", Cli[cliente].CPF);
+            getchar(); // Limpar o buffer de entrada
+            break;
+        case 5:
+            printf("Número de quartos: ");
+            scanf("%d", &Cli[cliente].NQuartos);
+            break;
+        case 6:
+            printf("Número de dias: ");
+            scanf("%d", &Cli[cliente].dias);
+            break;
+        default:
+            editar();
+    }
+}
+
+void excluir() {
+    int cliente, op2;
+    printf("Digite o Código de Identificação do cliente registrado:\n");
+    printf(": ");
+    scanf("%d", &cliente);
+
+    printf("Selecione o dado que deseja excluir:\n");
+    printf("1- Nome\n");
+    printf("2- Sobrenome\n");
+    printf("3- Idade\n");
+    printf("4- CPF\n");
+    printf("5- Número de quartos\n");
+    printf("6- Número de dias\n");
+
+    printf(": ");
+    scanf("%d", &op2);
+
+    cliente--; // ajustar para índice do vetor
+
+    switch (op2) {
+        case 1:
+            printf("Nome removido!\n");
+            strcpy(Cli[cliente].nome, "Sem dado");
+            break;
+        case 2:
+            printf("Sobrenome removido!\n");
+            strcpy(Cli[cliente].sobrenome, "Sem dado");
+            break;
+        case 3:
+            printf("Idade removida!\n");
+            Cli[cliente].idade = 0;
+            break;
+        case 4:
+            printf("CPF removido!\n");
+            strcpy(Cli[cliente].CPF, "Sem dado");
+            break;
+        case 5:
+            printf("Número de quartos removido!\n");
+            Cli[cliente].NQuartos = 0;
+            break;
+        case 6:
+            printf("Número de dias removido!\n");
+            Cli[cliente].dias = 0;
+            break;
+        default:
+            excluir();
+    }
+}
+
+void calcularValorTotal() {
+    int diariaPorPessoa = 60;
+
+    for (int i = 0; i < Ncli; i++) {
+        int total = 0;
+
+        if (Cli[i].dias == 0) {
+            printf("Número de dias não definido para o cliente %s!\n", Cli[i].nome);
+            continue;
+        }
+
+        // Verificar se o cliente tem menos de 6 anos
+        if (Cli[i].idade <= 6) {
+            // Se tiver menos de 6 anos, não paga diária
+            total += 20 * Cli[i].NQuartos; // Apenas taxa por quarto
+        } else {
+            // Caso contrário, calcular diária normalmente
+            total += (diariaPorPessoa * Cli[i].dias) + (20 * Cli[i].NQuartos); // Diária por pessoa + taxa por quarto
+        }
+
+        printf("Valor total da estadia para o cliente %s: R$%d\n", Cli[i].nome, total);
+    }
+
+    int op;
+    do {
+        printf("Digite 1 para voltar ao menu!\n");
+        printf(": ");
+        scanf("%d", &op);
+        getchar(); // Limpar o buffer de entrada
+    } while (op != 1);
+}
+
+void informacaoValores() {
+    printf("Hotel Dispor - Informações sobre Valores:\n");
+    printf("-----------------------------------------\n");
+    printf("Taxa por quarto: R$20 por quarto\n");
+    printf("Diária por pessoa: R$60 por dia\n");
+    printf("Crianças até 6 anos não pagam diária.\n");
+    printf("-----------------------------------------\n");
+    printf("\n");
+}
+
+int menu() {
+    int op;
+    printf("Hotel Dispor!!!\n");
+    printf("1- Registro Grupal\n");
+    printf("2- Definir número de quartos para o grupo\n");
+    printf("3- Definir número de dias para cada cliente\n");
+    printf("4- Conferir dados dos clientes registrados\n");
+    printf("5- Editar registro\n");
+    printf("6- Excluir dado de um registro\n");
+    printf("7- Valor total da estadia por cliente\n");
+    printf("8- Informação sobre Valores\n");
+    printf("0- Sair\n");
+    printf(": ");
+    scanf("%d", &op);
+    getchar(); // Limpar o buffer de entrada
+    return op;
+}
+
+int main() {
+    int op;
+
+    do {
+        op = menu();
+        switch (op) {
+            case 0:
+                printf("Saindo do programa...\n");
+                break;
+            case 1:
+                do {
+                    registro();
+                    printf("Deseja registrar outro cliente? (s/n): ");
+                    char resposta;
+                    scanf(" %c", &resposta);
+                    getchar(); // Limpar o buffer de entrada
+                    if (resposta != 's' && resposta != 'S') {
+                        break;
+                    }
+                } while (1);
+                break;
+            case 2:
+                definirQuartosParaTodos();
+                break;
+            case 3:
+                definirDiasIndividualmente();
+                break;
+            case 4:
+                mostrarDados();
+                break;
+            case 5:
+                editar();
+                break;
+            case 6:
+                excluir();
+                break;
+            case 7:
+                calcularValorTotal();
+                break;
+            case 8:
+                informacaoValores();
+                break;
+            default:
+                printf("||||| OPÇÃO INVÁLIDA |||||\n\n");
+        }
+    } while (op != 0);
+
+    free(Cli); // Liberar memória alocada dinamicamente
+
+    return 0;
+}
